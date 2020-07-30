@@ -1,5 +1,6 @@
 class Pacman
-  def start
+  def walk
+
   end
 
   def eat
@@ -7,5 +8,4 @@ class Pacman
 
   def life
   end
-   
 end
