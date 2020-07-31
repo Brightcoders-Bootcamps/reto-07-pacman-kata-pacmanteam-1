@@ -20,9 +20,16 @@ class Board
   def center_pacman(pacman)
     coordinate = (dimension / 2)
     board[coordinate, coordinate] = pacman
+    pacman.coordinate_row = coordinate
+    pacman.coordinate_column = coordinate
   end
 
-  def walk_pacman
+  def board_iteration(pacman)
+    loop do
+      board_element = board[pacman.coordinate_row, pacman.coordinate_column - 1]
+    
+      break if pacman.dead?
+    end
   end
 
   def print_board
