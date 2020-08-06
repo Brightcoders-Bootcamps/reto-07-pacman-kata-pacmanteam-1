@@ -14,7 +14,7 @@ class Board
   end
 
   def build
-    game_values_array = [Ghost.new, 'o', '|', '-', 'o']
+    game_values_array = ['o', Ghost.new, 'o', '|', 'o', 'o']
     @board = Matrix.build(dimension) { game_values_array.sample }
   end
 
@@ -27,6 +27,27 @@ class Board
 
   def board_iteration(pacman)
     loop do
+      row = pacman.watch_coordinate[pacman.direction][:row]
+      column = pacman.watch_coordinate[pacman.direction][:column]
+      case row
+      when pacman.direction == "up" && row < 0 && column == 0
+        pacman.direction = "rigth"
+      when pacman.direction == "left" && row == 0 && column < 0
+        pacman.direction = "left"
+      when pacman.direction == "rigth" && row == 0 && column >= dimension
+        pacman.direction = "down"
+      when pacman.direction == "up" && row < 0 && column == (dimension -1)
+        pacman.direction = "left" 
+      when pacman.direction == "down" && row >= dimension && column == (dimension -1)
+        pacman.direction = "rigth"
+      when pacman.direction == "left" && row == (dimension -1) && column >= (dimension + 1)
+        pacman.direction = "up"
+      when pacman.direction == "left" && row == (dimension -1) && column < 0
+        pacman.direction = "up"
+      when pacman.direction == "down" && row >= (dimension +1) && column == 0
+        pacman.direction = "rigth" 
+      end
+      
       board_element = board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] 
       pacman_steps_validations(board_element, pacman)
       break if pacman.dead?
@@ -40,15 +61,15 @@ class Board
       pacman.update_score
       board[pacman.coordinate_row, pacman.coordinate_column] = ''
       board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] = pacman
-      case pacman.direction do
+      case pacman.direction
       when "up"
         pacman.coordinate_row = pacman.coordinate_row - 1
       when "left"
-        pacman.coordinate_column + 1
+        pacman.coordinate_column = pacman.coordinate_column + 1
       when "down"
-        pacman.coordinate_row + 1
+        pacman.coordinate_row = pacman.coordinate_row + 1
       when "right"
-        pacman.coordinate_column -1
+        pacman.coordinate_column = pacman.coordinate_column -1
       end
     elsif "|"
       index = board_directions.find_index(pacman.direction) + 1
@@ -70,8 +91,10 @@ class Board
   end
 end
 
-board = Board.new(10)
+board = Board.new(6)
 pacman = Pacman.new
 board.build
 board.center_pacman(pacman)
+board.board_iteration(pacman)
 board.print_board
+puts pacman.dead?

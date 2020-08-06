@@ -21,10 +21,10 @@ class Pacman
 
   def watch_coordinate
     {
-      "up" => { row: coordinate_row - 1, column: coordinate_row},
-      "left" => { row: coordinate_row, column: coordinate_column + 1},
-      "down" => { row: coordinate_row + 1, column: coordinate_column},
-      "rigth" => { row: coordinate_row, column: coordinate_column -1}
+      "up" => { row: (coordinate_row - 1), column: coordinate_column},
+      "rigth" => { row: coordinate_row, column: (coordinate_column + 1)},
+      "down" => { row: (coordinate_row + 1), column: coordinate_column},
+      "left" => { row: coordinate_row, column: (coordinate_column -1)}
     }
   end
 
