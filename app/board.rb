@@ -5,9 +5,10 @@ require_relative 'ghost.rb'
 require 'matrix'
 require 'Pry'
 
-# board class
+# Board class
 class Board
   attr_reader :dimension, :board
+
   def initialize(dimension)
     @dimension = dimension
   end
@@ -26,7 +27,7 @@ class Board
 
   def board_iteration(pacman)
     loop do
-      board_element = board[pacman.coordinate_row - 1, pacman.coordinate_column] 
+      board_element = board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] 
       pacman_steps_validations(board_element, pacman)
       break if pacman.dead?
     end
@@ -37,21 +38,31 @@ class Board
       pacman.dead = true
     elsif board_element == 'o'
       pacman.update_score
-      board[pacman.coordinate_row - 1, pacman.coordinate_column] = pacman
-      pacman.coordinate_row = pacman.coordinate_row - 1
-    elsif board_element == '|'
-      board_element = board[pacman.coordinate_row , pacman.coordinate_column - 1]
-      if board_element == 'o'
-        pacman.update_score
-        board[pacman.coordinate_row - 1, pacman.coordinate_column] = pacman
+      board[pacman.coordinate_row, pacman.coordinate_column] = ''
+      board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] = pacman
+      case pacman.direction do
+      when "up"
         pacman.coordinate_row = pacman.coordinate_row - 1
-      elsif board_element.class == Ghost
-        pacman.dead = true 
-      elsif board_element == '-'
-        board_element = board[pacman.coordinate_row , pacman.coordinate_column + 1]
+      when "left"
+        pacman.coordinate_column + 1
+      when "down"
+        pacman.coordinate_row + 1
+      when "right"
+        pacman.coordinate_column -1
       end
-    elsif board_element == '-'
+    elsif "|"
+      index = board_directions.find_index(pacman.direction) + 1
+      index = 0 if index > board_directions.size
+      new_direction = board_directions[index]
+      pacman.direction = new_direction
+    else
+      board[pacman.coordinate_row, pacman.coordinate_column] = ''
+      board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] = pacman
     end
+  end
+
+  def board_directions
+    ["up", "left", "down", "rigth"]
   end
 
   def print_board
