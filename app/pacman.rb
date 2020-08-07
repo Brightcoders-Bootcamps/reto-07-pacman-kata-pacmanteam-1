@@ -24,12 +24,12 @@ class Pacman
       "up" => { row: (coordinate_row - 1), column: coordinate_column},
       "rigth" => { row: coordinate_row, column: (coordinate_column + 1)},
       "down" => { row: (coordinate_row + 1), column: coordinate_column},
-      "left" => { row: coordinate_row, column: (coordinate_column -1)}
+      "left" => { row: coordinate_row, column: (coordinate_column - 1)}
     }
   end
 
   def update_score
-    score = score + 1
+    score =+ 1
   end
 end
 

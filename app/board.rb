@@ -24,7 +24,7 @@ class Board
     pacman.coordinate_row = coordinate
     pacman.coordinate_column = coordinate
   end
-
+  
   def board_iteration(pacman)
     loop do
       row = pacman.watch_coordinate[pacman.direction][:row]
@@ -36,15 +36,15 @@ class Board
         pacman.direction = "left"
       when pacman.direction == "rigth" && row == 0 && column >= dimension
         pacman.direction = "down"
-      when pacman.direction == "up" && row < 0 && column == (dimension -1)
+      when pacman.direction == "up" && row < 0 && column == (dimension - 1)
         pacman.direction = "left" 
-      when pacman.direction == "down" && row >= dimension && column == (dimension -1)
+      when pacman.direction == "down" && row >= dimension && column == (dimension - 1)
         pacman.direction = "rigth"
-      when pacman.direction == "left" && row == (dimension -1) && column >= (dimension + 1)
+      when pacman.direction == "left" && row == (dimension - 1) && column >= (dimension + 1)
         pacman.direction = "up"
-      when pacman.direction == "left" && row == (dimension -1) && column < 0
+      when pacman.direction == "left" && row == (dimension - 1) && column < 0
         pacman.direction = "up"
-      when pacman.direction == "down" && row >= (dimension +1) && column == 0
+      when pacman.direction == "down" && row >= (dimension + 1) && column == 0
         pacman.direction = "rigth" 
       end
       
