@@ -1,25 +1,27 @@
+# frozen_string_literal: true
+
 # class Pacman
 class Pacman
   attr_reader :coordinate_row, :coordinate_column, :dead, :direction
-  
+
   def initialize
     @coordinate_row = nil
     @coordinate_column = nil
     @dead = false
     @score = 0
-    @direction = "up"
+    @direction = 'up'
   end
-  
+
   def dead?
     dead
   end
 
   def watch_coordinate
     {
-      "up" => { row: (@coordinate_row - 1), column: @coordinate_column},
-      "rigth" => { row: @coordinate_row, column: (@coordinate_column + 1)},
-      "down" => { row: (@coordinate_row + 1), column: @coordinate_column},
-      "left" => { row: @coordinate_row, column: (@coordinate_column - 1)}
+      'up' => { row: (@coordinate_row - 1), column: @coordinate_column},
+      'rigth' => { row: @coordinate_row, column: (@coordinate_column + 1)},
+      'down' => { row: (@coordinate_row + 1), column: @coordinate_column},
+      'left' => { row: @coordinate_row, column: (@coordinate_column - 1)}
     }
   end
 
