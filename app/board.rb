@@ -2,15 +2,18 @@
 
 require_relative 'pacman.rb'
 require_relative 'ghost.rb'
+require_relative 'direction.rb'
 require 'matrix'
-require 'Pry'
+require 'pry'
 
 # Board class
 class Board
-  attr_reader :dimension, :board
+  attr_reader :dimension, :board, :row, :column
 
   def initialize(dimension)
     @dimension = dimension
+    @row = nil
+    @column = nil
   end
 
   def build
@@ -21,73 +24,83 @@ class Board
   def center_pacman(pacman)
     coordinate = (dimension / 2)
     board[coordinate, coordinate] = pacman
-    pacman.coordinate_row = coordinate
-    pacman.coordinate_column = coordinate
+    pacman.update_coordinate_row(coordinate)
+    pacman.update_coordinate_column(coordinate)
   end
   
   def board_iteration(pacman)
     loop do
-      row = pacman.watch_coordinate[pacman.direction][:row]
-      column = pacman.watch_coordinate[pacman.direction][:column]
-      case row
-      when pacman.direction == "up" && row < 0 && column == 0
-        pacman.direction = "rigth"
-      when pacman.direction == "left" && row == 0 && column < 0
-        pacman.direction = "left"
-      when pacman.direction == "rigth" && row == 0 && column >= dimension
-        pacman.direction = "down"
-      when pacman.direction == "up" && row < 0 && column == (dimension - 1)
-        pacman.direction = "left" 
-      when pacman.direction == "down" && row >= dimension && column == (dimension - 1)
-        pacman.direction = "rigth"
-      when pacman.direction == "left" && row == (dimension - 1) && column >= (dimension + 1)
-        pacman.direction = "up"
-      when pacman.direction == "left" && row == (dimension - 1) && column < 0
-        pacman.direction = "up"
-      when pacman.direction == "down" && row >= (dimension + 1) && column == 0
-        pacman.direction = "rigth" 
-      end
-      
-      board_element = board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] 
-      pacman_steps_validations(board_element, pacman)
+      loop_validations(pacman)
       break if pacman.dead?
     end
+
+    puts pacman.score
+  end
+
+  def loop_validations(pacman)
+    set_pacman_coordinates(pacman)
+    direction = Direction.new(pacman.direction, @row, @column, dimension).calculate
+    pacman = pacman_update_direction(pacman)
+    board_element = board[@row, @column] 
+    pacman_steps_validations(board_element, pacman)
+  end
+
+  def pacman_update_direction(pacman)
+    direction = Direction.new(pacman.direction, @row, @column, dimension).calculate
+    pacman.update_direction(direction)
+    pacman
   end
 
   def pacman_steps_validations(board_element, pacman)
-    if board_element.class == Ghost
-      pacman.dead = true
-    elsif board_element == 'o'
-      pacman.update_score
-      board[pacman.coordinate_row, pacman.coordinate_column] = ''
-      board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] = pacman
-      case pacman.direction
-      when "up"
-        pacman.coordinate_row = pacman.coordinate_row - 1
-      when "left"
-        pacman.coordinate_column = pacman.coordinate_column + 1
-      when "down"
-        pacman.coordinate_row = pacman.coordinate_row + 1
-      when "right"
-        pacman.coordinate_column = pacman.coordinate_column -1
-      end
-    elsif "|"
-      index = board_directions.find_index(pacman.direction) + 1
-      index = 0 if index > board_directions.size
-      new_direction = board_directions[index]
-      pacman.direction = new_direction
-    else
-      board[pacman.coordinate_row, pacman.coordinate_column] = ''
-      board[pacman.watch_coordinate[pacman.direction][:row], pacman.watch_coordinate[pacman.direction][:column]] = pacman
-    end
+    return pacman.kill_him if board_element.class == Ghost
+    validate_not_walls(board_element, pacman)
+    validate_points(board_element, pacman)
+    validate_walls(board_element, pacman)
+  end
+
+  def validate_not_walls(board_element, pacman)
+    return if board_element == "|"
+
+    reset_space
+    set_pacman(pacman)
+  end
+
+  def validate_walls(board_element, pacman)
+    return if board_element != "|"
+    
+    direction = next_direction(pacman.direction)
+    pacman.update_direction(direction)
+  end
+
+  def validate_points(board_element, pacman)
+    pacman.walk if board_element == 'o'
+  end
+
+  def set_pacman_coordinates(pacman)
+    @row = pacman.watch_coordinate(pacman)[pacman.direction][:row]
+    @column = pacman.watch_coordinate(pacman)[pacman.direction][:column]
+  end
+
+  def next_direction(actual_direction)
+    index = board_directions.find_index(actual_direction) + 1
+    index = 0 if index > board_directions.size
+    board_directions[index]
   end
 
   def board_directions
     ["up", "left", "down", "rigth"]
   end
 
+  def reset_space
+    board[@row, @column] = ''
+  end
+
+  def set_pacman(pacman)
+    board[@row, @column] = pacman
+  end
+
   def print_board
-    print board
+    board.each_slice(board.column_size) {|row| p row}
   end
 end
 
@@ -97,4 +110,3 @@ board.build
 board.center_pacman(pacman)
 board.board_iteration(pacman)
 board.print_board
-puts pacman.dead?

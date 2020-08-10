@@ -1,8 +1,6 @@
+# class Ghost
 class Ghost
-  def eat
+  def initialize
+    @age = 100
   end
-
-  def walk
-  end
-  a = Ghost.new
 end
